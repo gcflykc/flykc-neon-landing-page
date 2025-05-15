@@ -139,7 +139,7 @@ const CalculatorPanel = () => {
             </div>
             <Slider
               value={[age]}
-              min={18}
+              min={15}
               max={80}
               step={1}
               className="bg-flykc-gray"
