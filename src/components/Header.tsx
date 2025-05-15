@@ -24,9 +24,11 @@ const Header = () => {
     >
       <div className="flykc-container flex items-center justify-between">
         <div className="flex items-center">
-          <a href="#" className="text-2xl font-bold flex items-center">
-            <span className="text-flykc-cyan">FLYK</span>
-            <span className="gradient-text">c</span>
+          <a href="#" className="text-2xl font-bold flex items-center relative">
+            {/* Logo com efeito de luz */}
+            <div className="absolute -inset-1 rounded-full blur-md bg-flykc-cyan/30 animate-pulse-glow"></div>
+            <span className="relative text-flykc-cyan z-10">FLYK</span>
+            <span className="relative gradient-text z-10">c</span>
           </a>
         </div>
         

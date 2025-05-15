@@ -119,4 +119,23 @@
   .gradient-text {
     @apply bg-clip-text text-transparent bg-flykc-gradient;
   }
+  
+  /* Customização dos componentes UI para o tema FLYKc */
+  .flykc-slider .absolute {
+    @apply bg-flykc-cyan;
+  }
+  
+  .flykc-slider .rounded-full {
+    @apply border-flykc-cyan;
+  }
 }
+
+/* Customização do componente Slider */
+[data-radix-slider-thumb] {
+  @apply bg-flykc-cyan border-none !important;
+}
+
+[data-radix-slider-range] {
+  @apply bg-flykc-gradient !important;
+}
+
