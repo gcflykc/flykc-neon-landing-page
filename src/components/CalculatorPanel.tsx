@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Body, Weight, Activity, Calendar, Utensils } from "lucide-react";
+import { User, Weight, Activity, Calendar, Utensils } from "lucide-react";
 
 type BodyType = "ectomorfo" | "mesomorfo" | "endomorfo";
 type ActivityLevel = "sedentário" | "leve" | "moderado" | "intenso" | "atleta";
@@ -42,7 +42,7 @@ const CalculatorPanel = () => {
     <div className="flykc-card bg-flykc-gray-alt/50 backdrop-blur-md border border-flykc-gray-alt/70 p-6 rounded-xl">
       <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
         <span className="bg-flykc-gradient p-2 rounded-md">
-          <Body size={24} className="text-black" />
+          <User size={24} className="text-black" />
         </span>
         Cálculo Personalizado
       </h3>
@@ -52,7 +52,7 @@ const CalculatorPanel = () => {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <Label className="text-gray-300 flex items-center gap-2">
-                <Body size={18} className="text-flykc-cyan" />
+                <User size={18} className="text-flykc-cyan" />
                 Altura (cm)
               </Label>
               <span className="text-flykc-cyan font-medium">{height} cm</span>
@@ -87,7 +87,7 @@ const CalculatorPanel = () => {
           
           <div className="space-y-2">
             <Label className="text-gray-300 flex items-center gap-2">
-              <Body size={18} className="text-flykc-cyan" />
+              <User size={18} className="text-flykc-cyan" />
               Porte de Corpo
             </Label>
             <Select
