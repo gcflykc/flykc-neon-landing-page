@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer className="bg-flykc-black-alt pt-16 pb-8">
       <div className="flykc-container">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           <div>
             <a href="#" className="text-2xl font-bold flex items-center mb-4">
               <span className="text-flykc-cyan">FLYK</span>
@@ -36,22 +36,9 @@ const Footer = () => {
           <div>
             <h5 className="text-white font-semibold mb-4">Links Rápidos</h5>
             <ul className="space-y-2">
-              <li><a href="#produtos" className="text-gray-400 hover:text-flykc-cyan">Produtos</a></li>
               <li><a href="#benefícios" className="text-gray-400 hover:text-flykc-cyan">Benefícios</a></li>
               <li><a href="#ciência" className="text-gray-400 hover:text-flykc-cyan">Nossa Ciência</a></li>
-              <li><a href="#depoimentos" className="text-gray-400 hover:text-flykc-cyan">Depoimentos</a></li>
               <li><a href="#contato" className="text-gray-400 hover:text-flykc-cyan">Contato</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h5 className="text-white font-semibold mb-4">Informações</h5>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-flykc-cyan">Sobre Nós</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-flykc-cyan">Política de Privacidade</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-flykc-cyan">Termos de Uso</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-flykc-cyan">FAQ</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-flykc-cyan">Blog</a></li>
             </ul>
           </div>
           

@@ -34,7 +34,7 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          {["Produtos", "Benefícios", "Ciência", "Depoimentos"].map((item) => (
+          {["Benefícios", "Ciência"].map((item) => (
             <a 
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -67,7 +67,7 @@ const Header = () => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-flykc-black-alt border-t border-flykc-gray-alt">
           <div className="flykc-container py-4 space-y-4">
-            {["Produtos", "Benefícios", "Ciência", "Depoimentos"].map((item) => (
+            {["Benefícios", "Ciência"].map((item) => (
               <a 
                 key={item}
                 href={`#${item.toLowerCase()}`}
