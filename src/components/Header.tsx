@@ -25,10 +25,10 @@ const Header = () => {
       <div className="flykc-container flex items-center justify-between">
         <div className="flex items-center">
           <a href="#" className="text-2xl font-bold flex items-center">
-            {/* Logo com efeito de luz melhorado */}
+            {/* Logo com efeito de luz aprimorado */}
             <div className="relative">
-              <span className="text-flykc-cyan animate-pulse filter drop-shadow-[0_0_10px_#00ffd5]">FLYK</span>
-              <span className="gradient-text animate-pulse filter drop-shadow-[0_0_8px_#00bfa5]">c</span>
+              <span className="text-flykc-cyan text-3xl font-bold filter drop-shadow-[0_0_15px_#00ffd5] animate-pulse-glow">FLYK</span>
+              <span className="text-flykc-teal text-3xl font-bold filter drop-shadow-[0_0_10px_#00ffd5] animate-pulse-glow">c</span>
             </div>
           </a>
         </div>
