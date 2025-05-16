@@ -13,6 +13,13 @@ interface Message {
   timestamp: Date;
 }
 
+interface Lead {
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  interest: string | null;
+}
+
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -20,24 +27,85 @@ const ChatBot = () => {
     {
       id: "welcome",
       role: "assistant",
-      content: "Olá! Sou o assistente da FLYKc. Como posso ajudar você hoje? Gostaria de saber mais sobre nosso suplemento cognitivo?",
+      content: "Olá! Sou o assistente da FLYKc. Como posso te chamar?",
       timestamp: new Date(),
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [currentStep, setCurrentStep] = useState("name");
+  const [lead, setLead] = useState<Lead>({
+    name: null,
+    email: null,
+    phone: null,
+    interest: null,
+  });
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  // Predefined responses for the bot
-  const responses = {
-    default: "Não entendi completamente. Posso ajudar com informações sobre o suplemento FLYKc, seus benefícios ou como adquirir.",
-    greeting: "Olá! É um prazer conversar com você. Como posso ajudar hoje?",
-    benefits: "O FLYKc é um suplemento cognitivo avançado que oferece diversos benefícios: melhora do foco e concentração, aumento da memória, clareza mental, e suporte energético para o cérebro.",
-    ingredients: "O FLYKc contém uma fórmula exclusiva com ingredientes naturais como Bacopa Monnieri, L-Teanina, Fosfatidilserina, Ginkgo Biloba e outros componentes que auxiliam na função cognitiva.",
-    howToUse: "Recomendamos tomar 1 cápsula de FLYKc pela manhã, preferencialmente após o café da manhã, para melhores resultados ao longo do dia.",
-    price: "O FLYKc está disponível em diferentes opções: frasco com 30 cápsulas (tratamento mensal) por R$197, ou kits promocionais com desconto progressivo para 3 ou 6 meses de tratamento.",
-    purchase: "Para adquirir o FLYKc, basta preencher o formulário de contato em nossa página ou clicar no botão 'Comprar agora'. Entregas para todo o Brasil!",
-    science: "O FLYKc foi desenvolvido após anos de pesquisas científicas sobre neuroplasticidade e nutrição cerebral. Nossa fórmula é baseada em estudos recentes sobre os melhores compostos para suporte cognitivo."
+  // Conversation flow steps
+  const conversationSteps = {
+    name: {
+      question: "Como posso te chamar?",
+      nextStep: "email",
+      processAnswer: (answer: string) => {
+        setLead(prev => ({ ...prev, name: answer.trim() }));
+        return `Prazer em conhecê-lo, ${answer.trim()}! Qual é o seu e-mail para que possamos enviar mais informações sobre o FLYKc?`;
+      }
+    },
+    email: {
+      question: "Qual é o seu e-mail para contato?",
+      nextStep: "phone",
+      processAnswer: (answer: string) => {
+        const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+        if (emailRegex.test(answer)) {
+          setLead(prev => ({ ...prev, email: answer.trim() }));
+          return "Obrigado! E qual seria um telefone para contato?";
+        } else {
+          return "Parece que este e-mail não é válido. Poderia informar novamente?";
+        }
+      }
+    },
+    phone: {
+      question: "Qual seu telefone para contato?",
+      nextStep: "interest",
+      processAnswer: (answer: string) => {
+        // Simplified phone validation
+        const phoneRegex = /\d{8,}/;
+        if (phoneRegex.test(answer.replace(/\D/g, ''))) {
+          setLead(prev => ({ ...prev, phone: answer.trim() }));
+          return "Excelente! O que mais te interessa no suplemento FLYKc? (Foco, Memória, Energia, Saúde cerebral)";
+        } else {
+          return "Parece que este número não é válido. Poderia informar novamente?";
+        }
+      }
+    },
+    interest: {
+      question: "O que mais te interessa no FLYKc?",
+      nextStep: "complete",
+      processAnswer: (answer: string) => {
+        setLead(prev => ({ ...prev, interest: answer.trim() }));
+        return `Perfeito! Agora posso te ajudar melhor. O FLYKc é ideal para ${answer.trim().toLowerCase()}. O que gostaria de saber sobre nosso suplemento cognitivo?`;
+      }
+    },
+    complete: {
+      question: "",
+      nextStep: "complete",
+      processAnswer: (answer: string) => {
+        // Handle general questions after lead capture is complete
+        if (answer.toLowerCase().includes("preço") || answer.toLowerCase().includes("valor") || answer.toLowerCase().includes("custo")) {
+          return "O FLYKc está disponível em diferentes opções: frasco com 30 cápsulas (tratamento mensal) por R$197, ou kits promocionais com desconto progressivo para 3 ou 6 meses de tratamento.";
+        } else if (answer.toLowerCase().includes("ingred") || answer.toLowerCase().includes("compos")) {
+          return "O FLYKc contém uma fórmula exclusiva com ingredientes naturais como Bacopa Monnieri, L-Teanina, Fosfatidilserina, Ginkgo Biloba e outros componentes que auxiliam na função cognitiva.";
+        } else if (answer.toLowerCase().includes("comprar") || answer.toLowerCase().includes("adquirir")) {
+          return "Para adquirir o FLYKc, basta preencher o formulário de contato em nossa página ou clicar no botão 'Comprar agora'. Entregas para todo o Brasil!";
+        } else if (answer.toLowerCase().includes("uso") || answer.toLowerCase().includes("tomar")) {
+          return "Recomendamos tomar 1 cápsula de FLYKc pela manhã, preferencialmente após o café da manhã, para melhores resultados ao longo do dia.";
+        } else {
+          return "Obrigado pelo seu interesse no FLYKc! Nossa equipe entrará em contato em breve com mais informações personalizadas para você. Tem mais alguma dúvida que eu possa ajudar?";
+        }
+      }
+    }
   };
 
   // Autoscroll to bottom of messages
@@ -47,41 +115,6 @@ const ChatBot = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Helper function to get a response based on user input
-  const getBotResponse = (userMessage: string) => {
-    const lowerCaseMessage = userMessage.toLowerCase();
-    
-    if (lowerCaseMessage.includes("olá") || lowerCaseMessage.includes("oi") || lowerCaseMessage.includes("bom dia") || lowerCaseMessage.includes("boa tarde") || lowerCaseMessage.includes("boa noite")) {
-      return responses.greeting;
-    }
-    
-    if (lowerCaseMessage.includes("benefício") || lowerCaseMessage.includes("vantagem") || lowerCaseMessage.includes("para que serve")) {
-      return responses.benefits;
-    }
-    
-    if (lowerCaseMessage.includes("ingrediente") || lowerCaseMessage.includes("composto") || lowerCaseMessage.includes("fórmula") || lowerCaseMessage.includes("composição")) {
-      return responses.ingredients;
-    }
-    
-    if (lowerCaseMessage.includes("usar") || lowerCaseMessage.includes("tomar") || lowerCaseMessage.includes("consumir") || lowerCaseMessage.includes("dosagem")) {
-      return responses.howToUse;
-    }
-    
-    if (lowerCaseMessage.includes("preço") || lowerCaseMessage.includes("valor") || lowerCaseMessage.includes("custo") || lowerCaseMessage.includes("quanto custa")) {
-      return responses.price;
-    }
-    
-    if (lowerCaseMessage.includes("comprar") || lowerCaseMessage.includes("adquirir") || lowerCaseMessage.includes("compra") || lowerCaseMessage.includes("onde")) {
-      return responses.purchase;
-    }
-    
-    if (lowerCaseMessage.includes("ciência") || lowerCaseMessage.includes("pesquisa") || lowerCaseMessage.includes("estudo") || lowerCaseMessage.includes("científico")) {
-      return responses.science;
-    }
-    
-    return responses.default;
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -97,40 +130,44 @@ const ChatBot = () => {
       timestamp: new Date(),
     };
     
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setMessage("");
     
     // Simulate bot typing
     setIsTyping(true);
     
-    // Simulate response delay
+    // Process the current step
     setTimeout(() => {
-      const botResponse: Message = {
+      const currentStepConfig = conversationSteps[currentStep as keyof typeof conversationSteps];
+      const botResponse = currentStepConfig.processAnswer(userMessage.content);
+      
+      const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: getBotResponse(userMessage.content),
+        content: botResponse,
         timestamp: new Date(),
       };
       
-      setMessages((prev) => [...prev, botResponse]);
+      setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
       
-      // Capture lead if email or phone is detected
+      // Move to next step if validation passed (when the step changes)
       const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-      const phoneRegex = /(?:^|\D)((?:\d{2,3}[ .-]?){2}\d{4,5})(?:\D|$)/; // Brazilian phone format
+      const phoneRegex = /\d{8,}/;
       
-      const hasEmail = emailRegex.test(userMessage.content);
-      const hasPhone = phoneRegex.test(userMessage.content);
+      if (currentStep === "email" && emailRegex.test(userMessage.content) || 
+          currentStep === "phone" && phoneRegex.test(userMessage.content.replace(/\D/g, '')) || 
+          (currentStep !== "email" && currentStep !== "phone")) {
+        setCurrentStep(currentStepConfig.nextStep);
+      }
       
-      if (hasEmail || hasPhone) {
-        // Store lead info (this would connect to a backend in a real implementation)
-        const leadInfo = userMessage.content;
-        console.log("Lead capturado:", leadInfo);
+      // Show success notification when lead is complete
+      if (currentStep === "interest") {
+        console.log("Lead capturado:", lead);
         
-        // Show success notification
         toast({
           title: "Contato registrado!",
-          description: "Obrigado pelo seu interesse. Entraremos em contato em breve.",
+          description: `Obrigado ${lead.name}! Entraremos em contato em breve.`,
         });
       }
     }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
