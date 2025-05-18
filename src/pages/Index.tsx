@@ -31,7 +31,7 @@ const Index = () => {
               <div className="order-1 md:order-2 flex justify-center">
                 <div className="relative">
                   <img 
-                    src="/lovable-uploads/9bc4c978-aaa8-490d-ac91-418d074d7322.png" 
+                    src="/uploads/product-image.png" 
                     alt="Suplemento Cognitivo FLYKc" 
                     className="max-h-96 object-contain drop-shadow-2xl animate-float"
                   />
