@@ -11,10 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { User, Weight, Activity, Calendar, Utensils } from "lucide-react";
-
-type BodyType = "ectomorfo" | "mesomorfo" | "endomorfo";
-type ActivityLevel = "sedentário" | "leve" | "moderado" | "intenso" | "atleta";
-type Goal = "perda_peso" | "manutenção" | "ganho_massa" | "performance";
+import { useToast } from "@/hooks/use-toast";
+import RecommendationResult from "./RecommendationResult";
+import { getSupplementRecommendation } from "@/services/openai";
+import { BodyType, ActivityLevel, Goal, RecommendationData } from "@/types/calculator";
 
 const CalculatorPanel = () => {
   const [height, setHeight] = useState<number>(170);
@@ -25,17 +25,63 @@ const CalculatorPanel = () => {
   const [goal, setGoal] = useState<Goal>("manutenção");
   const [mealsPerDay, setMealsPerDay] = useState<number>(3);
   
-  const handleCalculate = () => {
-    // Aqui entraria um cálculo personalizado baseado nos dados informados
-    console.log({
-      height,
-      weight,
-      bodyType,
-      activityLevel,
-      age,
-      goal,
-      mealsPerDay
-    });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [recommendation, setRecommendation] = useState<RecommendationData | undefined>(undefined);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [apiKeyInput, setApiKeyInput] = useState<string>("");
+  const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(!import.meta.env.VITE_OPENAI_API_KEY);
+  
+  const { toast } = useToast();
+  
+  const handleCalculate = async () => {
+    setIsLoading(true);
+    setError(undefined);
+    
+    // Check if we have an API key from the environment or input
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY || apiKeyInput;
+    
+    if (!apiKey) {
+      setShowApiKeyInput(true);
+      setIsLoading(false);
+      setError("É necessário fornecer uma chave de API OpenAI para continuar.");
+      return;
+    }
+    
+    try {
+      // Set the API key in environment if it was provided via input
+      if (apiKeyInput && !import.meta.env.VITE_OPENAI_API_KEY) {
+        // This doesn't actually modify the environment variable permanently
+        // It's just for this session's API calls
+        (window as any).OPENAI_API_KEY = apiKeyInput;
+      }
+      
+      const userData = {
+        height,
+        weight,
+        bodyType,
+        activityLevel,
+        age,
+        goal,
+        mealsPerDay
+      };
+      
+      const result = await getSupplementRecommendation(userData);
+      setRecommendation(result);
+      toast({
+        title: "Recomendação gerada",
+        description: "Sua recomendação personalizada foi calculada com sucesso.",
+      });
+    } catch (err) {
+      console.error("Erro ao gerar recomendação:", err);
+      setError("Não foi possível gerar sua recomendação. Verifique sua conexão e a chave da API.");
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Ocorreu um erro ao gerar sua recomendação.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -46,6 +92,24 @@ const CalculatorPanel = () => {
         </span>
         Cálculo Personalizado
       </h3>
+      
+      {showApiKeyInput && (
+        <div className="mb-6 p-4 border border-flykc-gray rounded-lg bg-flykc-gray/30">
+          <Label className="text-gray-300 mb-2 block">
+            Chave de API OpenAI
+          </Label>
+          <Input
+            type="password"
+            placeholder="Insira sua chave de API OpenAI"
+            value={apiKeyInput}
+            onChange={(e) => setApiKeyInput(e.target.value)}
+            className="border-flykc-gray-alt bg-flykc-gray text-white"
+          />
+          <p className="text-xs text-gray-400 mt-2">
+            Necessário para gerar recomendações personalizadas. Sua chave é usada apenas nesta sessão e não é armazenada.
+          </p>
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -190,8 +254,9 @@ const CalculatorPanel = () => {
             <button 
               onClick={handleCalculate}
               className="flykc-btn flykc-glow w-full"
+              disabled={isLoading}
             >
-              Calcular Suplementação Ideal
+              {isLoading ? 'Calculando...' : 'Calcular Suplementação Ideal'}
             </button>
             <p className="text-xs text-gray-400 mt-2 text-center">
               Resultados baseados em análises e estudos científicos
@@ -199,6 +264,15 @@ const CalculatorPanel = () => {
           </div>
         </div>
       </div>
+      
+      {/* Recommendation Results */}
+      {(isLoading || recommendation || error) && (
+        <RecommendationResult 
+          isLoading={isLoading} 
+          data={recommendation} 
+          error={error} 
+        />
+      )}
     </div>
   );
 };
