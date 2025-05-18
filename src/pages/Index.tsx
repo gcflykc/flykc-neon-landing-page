@@ -8,7 +8,6 @@ import CTASection from "@/components/CTASection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import CalculatorPanel from "@/components/CalculatorPanel";
-import GitHubLink from "@/components/GitHubLink";
 import ChatBot from "@/components/ChatBot";
 
 const Index = () => {
@@ -56,7 +55,6 @@ const Index = () => {
         <ScienceSection />
         <CTASection />
         <ContactSection />
-        <GitHubLink />
       </main>
       <Footer />
       <ChatBot />
